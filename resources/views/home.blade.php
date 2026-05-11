@@ -237,6 +237,7 @@
             <li><a href="#action" class="nav-link hover:text-[#F97316] transition">Notre action</a></li>
             <li><a href="#engagement" class="nav-link hover:text-[#F97316] transition">Engagement</a></li>
             <li><a href="#partenaires" class="nav-link hover:text-[#F97316] transition">Partenaires</a></li>
+            <li><a href="#forum" class="nav-link hover:text-[#F97316] transition">Forum</a></li>
         </ul>
 
         <div class="flex gap-3 items-center">

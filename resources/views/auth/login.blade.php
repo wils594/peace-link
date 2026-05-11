@@ -181,8 +181,8 @@
                 </div>
             </div>
             
-       <a href="{{ route('login') }}"
-                @csrf
+      <form method="POST" action="{{ route('login') }}" id="loginForm">
+    @csrf
                 
                 <!-- Email Address -->
                 <div>
@@ -276,7 +276,7 @@
         Créer un compte
     </a>
 </p>
-        
+      </form>  
         <!-- Footer sécurisé -->
         <div class="text-center mt-6 md:mt-8">
             <div class="flex flex-col items-center gap-2">

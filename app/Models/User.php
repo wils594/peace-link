@@ -10,8 +10,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+#[Fillable([
+
+    'name',
+    'email',
+    'password',
+
+    'role',
+    'status',
+
+    'phone',
+    'country',
+    'city',
+
+    'organization_name',
+    'organization_description',
+    'organization_members',
+    'organization_address',
+    'organization_website',
+
+    'specialization',
+    'motivation',
+
+    'subscription_status'
+
+])]
+
+#[Hidden([
+    'password',
+    'remember_token'
+])]
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -25,8 +54,16 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+
             'email_verified_at' => 'datetime',
+
             'password' => 'hashed',
+
         ];
     }
+
+    public function posts()
+{
+    return $this->hasMany(Post::class);
+}
 }
