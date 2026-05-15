@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Models\Report;
 
+
 /*
 |--------------------------------------------------------------------------
 | HOME
@@ -90,11 +91,9 @@ Route::get('/artisan/pending', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/signals', function () {
-
-    return view('signals');
-
-})->name('admin.signals');
+Route::get('/signals',
+    [ReportController::class, 'adminSignals'])
+    ->name('admin.signals');
 
 Route::get('/hotspots', function () {
 

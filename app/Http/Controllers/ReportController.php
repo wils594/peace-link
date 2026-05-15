@@ -73,4 +73,22 @@ class ReportController extends Controller
                 'Signalement envoyé avec succès.'
             );
     }
+
+public function adminSignals()
+{
+    $reports = Report::latest()->get();
+
+    $totalReports = $reports->count();
+
+    $pendingCount = Report::where('status', 'pending')->count();
+
+    $resolvedCount = Report::where('status', 'resolved')->count();
+
+    return view('signals', compact(
+        'reports',
+        'totalReports',
+        'pendingCount',
+        'resolvedCount'
+    ));
+}
 }
