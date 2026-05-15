@@ -3,40 +3,100 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $pendingArtisans = User::where('role', 'artisan')
+        /*
+        |--------------------------------------------------------------------------
+        | Artisans en attente
+        |--------------------------------------------------------------------------
+        */
+
+        $pendingArtisans = User::where('type', 'artisan')
             ->where('status', 'pending')
             ->latest()
             ->get();
 
-        return view('dashboard', compact('pendingArtisans'));
+        /*
+        |--------------------------------------------------------------------------
+        | Nombre d’artisans actifs
+        |--------------------------------------------------------------------------
+        */
+
+        $activeArtisans = User::where('type', 'artisan')
+            ->where('status', 'approved')
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistiques
+        |--------------------------------------------------------------------------
+        */
+
+        $totalReports = 0;
+        $resolvedReports = 0;
+        $pendingReports = 0;
+        $resolutionRate = 0;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Données vides
+        |--------------------------------------------------------------------------
+        */
+
+        $recentReports = [];
+        $regionsData = [];
+
+        return view('dashboard', compact(
+            'pendingArtisans',
+            'activeArtisans',
+            'totalReports',
+            'resolvedReports',
+            'pendingReports',
+            'resolutionRate',
+            'recentReports',
+            'regionsData'
+        ));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | APPROUVER ARTISAN
+    |--------------------------------------------------------------------------
+    */
+
     public function approve($id)
-{
-    $artisan = User::findOrFail($id);
+    {
+        $artisan = User::findOrFail($id);
 
-    $artisan->status = 'approved';
+        $artisan->status = 'approved';
 
-    $artisan->save();
+        $artisan->save();
 
-    return redirect()->back()
-        ->with('success', 'Artisan approuvé avec succès.');
-}
+        return redirect()
+            ->back()
+            ->with('success', 'Artisan approuvé avec succès.');
+    }
 
-public function reject($id)
-{
-    $artisan = User::findOrFail($id);
+    /*
+    |--------------------------------------------------------------------------
+    | REFUSER ARTISAN
+    |--------------------------------------------------------------------------
+    */
 
-    $artisan->status = 'rejected';
+    public function reject($id)
+    {
+        $artisan = User::findOrFail($id);
 
-    $artisan->save();
+        $artisan->status = 'rejected';
 
-    return redirect()->back()
-        ->with('success', 'Artisan refusé.');
-}
+        $artisan->save();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Artisan refusé.');
+    }
 }

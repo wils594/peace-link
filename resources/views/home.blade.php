@@ -277,9 +277,12 @@
                     <div class="lang-item" onclick="selectLang('DE')">🇩🇪 Deutsch</div>
                 </div>
             </div>
-            <a href="#signaler" class="bg-[#F97316] hover:bg-orange-600 px-6 py-2 rounded-full font-semibold text-sm transition shadow-lg shadow-orange-500/20">
-                Signaler
-            </a>
+            <a href="{{ route('report.create') }}"
+   class="bg-[#F97316] hover:bg-orange-600 px-6 py-2 rounded-full font-semibold text-sm transition shadow-lg shadow-orange-500/20">
+
+    Signaler
+
+</a>
         </div>
     </nav>
 

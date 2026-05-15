@@ -118,6 +118,11 @@
             color: #D97706;
         }
         
+        .badge-resolved {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        
         /* Scrollbar */
         .overflow-y-auto::-webkit-scrollbar {
             width: 6px;
@@ -141,6 +146,22 @@
         
         .animate-fadeIn {
             animation: fadeIn 0.4s ease-out;
+        }
+        
+        /* Loading spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #F97316;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         /* Responsive */
@@ -188,39 +209,39 @@
         <!-- Navigation -->
         <nav class="flex-1 py-6">
             <div class="px-4 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Principal</div>
-            <a href="#" class="sidebar-link active flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('dashboard') }}" class="sidebar-link active flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-tachometer-alt w-5"></i>
                 <span>Tableau de bord</span>
             </a>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.signals') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-flag w-5"></i>
                 <span>Signalements</span>
             </a>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.hotspots') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-map-marker-alt w-5"></i>
                 <span>Zones sensibles</span>
             </a>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.artisans') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-users w-5"></i>
-                <span>Médiateurs</span>
+                <span>Artisans de la paix</span>
             </a>
             
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Analyse</div>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.statistics') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-chart-line w-5"></i>
                 <span>Statistiques</span>
             </a>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.reports') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-download w-5"></i>
                 <span>Rapports</span>
             </a>
             
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Administration</div>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.admins') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-user-shield w-5"></i>
-                <span>Admins</span>
+                <span>Administrateurs</span>
             </a>
-            <a href="#" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('admin.settings') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-cog w-5"></i>
                 <span>Paramètres</span>
             </a>
@@ -285,9 +306,9 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs md:text-sm text-gray-500 mb-1">Total signalements</p>
-                            <p class="text-2xl md:text-3xl font-bold text-[#0F172A]" id="totalReports">{{ $totalReports ?? 0 }}</p>
-                            <p class="text-xs text-green-600 mt-2" id="totalTrend">
-                                <i class="fas fa-arrow-up"></i> <span>+0%</span> vs mois dernier
+                            <p class="text-2xl md:text-3xl font-bold text-[#0F172A]" id="totalReports">0</p>
+                            <p class="text-xs text-green-600 mt-2" id="reportGrowthText">
+                                <i class="fas fa-chart-line"></i> <span id="reportGrowth">0</span>% vs mois dernier
                             </p>
                         </div>
                         <div class="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -300,8 +321,8 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs md:text-sm text-gray-500 mb-1">Signalements résolus</p>
-                            <p class="text-2xl md:text-3xl font-bold text-green-600" id="resolvedReports">{{ $resolvedReports ?? 0 }}</p>
-                            <p class="text-xs text-gray-500 mt-2">Taux de résolution: <span id="resolutionRate">{{ $resolutionRate ?? 0 }}</span>%</p>
+                            <p class="text-2xl md:text-3xl font-bold text-green-600" id="resolvedReports">0</p>
+                            <p class="text-xs text-gray-500 mt-2">Taux de résolution: <span id="resolutionRate">0</span>%</p>
                         </div>
                         <div class="w-10 h-10 md:w-12 md:h-12 bg-green-100 rounded-xl flex items-center justify-center">
                             <i class="fas fa-check-circle text-green-600 text-lg md:text-xl"></i>
@@ -313,8 +334,8 @@
                     <div class="flex justify-between items-start">
                         <div>
                             <p class="text-xs md:text-sm text-gray-500 mb-1">En cours de traitement</p>
-                            <p class="text-2xl md:text-3xl font-bold text-orange-500" id="pendingReports">{{ $pendingReports ?? 0 }}</p>
-                            <p class="text-xs text-gray-500 mt-2">Délai moyen: <span id="avgResponseTime">24</span>h</p>
+                            <p class="text-2xl md:text-3xl font-bold text-orange-500" id="pendingReports">0</p>
+                            <p class="text-xs text-gray-500 mt-2">Délai moyen: <span id="avgResponseTime">0</span>h</p>
                         </div>
                         <div class="w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-xl flex items-center justify-center">
                             <i class="fas fa-spinner text-orange-500 text-lg md:text-xl"></i>
@@ -325,9 +346,9 @@
                 <div class="stat-card bg-white rounded-xl p-4 md:p-6 shadow-sm hover:shadow-md transition">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-xs md:text-sm text-gray-500 mb-1">Médiateurs actifs</p>
-                            <p class="text-2xl md:text-3xl font-bold text-blue-600" id="activeMediators">{{ $activeMediators ?? 0 }}</p>
-                            <p class="text-xs text-gray-500 mt-2">Disponibles 24/7</p>
+                            <p class="text-xs md:text-sm text-gray-500 mb-1">Artisans de la paix</p>
+                            <p class="text-2xl md:text-3xl font-bold text-blue-600" id="activeArtisans">0</p>
+                            <p class="text-xs text-gray-500 mt-2">+<span id="newArtisans">0</span> ce mois</p>
                         </div>
                         <div class="w-10 h-10 md:w-12 md:h-12 bg-blue-100 rounded-xl flex items-center justify-center">
                             <i class="fas fa-hand-peace text-blue-600 text-lg md:text-xl"></i>
@@ -336,7 +357,7 @@
                 </div>
             </div>
             
-            <!-- DEMANDES ARTISANS DE PAIX -->
+            <!-- DEMANDES ARTISANS DE PAIX EN ATTENTE -->
             <div class="bg-white rounded-xl shadow-sm animate-fadeIn mb-8">
                 <div class="p-4 md:p-6 border-b border-gray-100">
                     <div class="flex justify-between items-center flex-wrap gap-4">
@@ -344,88 +365,14 @@
                             <h3 class="font-bold text-[#0F172A] text-lg md:text-xl">Demandes artisans de paix</h3>
                             <p class="text-xs md:text-sm text-gray-500 mt-1">Candidatures en attente de validation</p>
                         </div>
-                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold">
-                            {{ $pendingArtisans->count() ?? 0 }} en attente
-                        </span>
+                        <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold" id="pendingCount">0 en attente</span>
                     </div>
                 </div>
-                
-                <div class="p-4 md:p-6">
-                    @forelse($pendingArtisans ?? [] as $artisan)
-                        <div class="artisan-card rounded-xl p-4 md:p-5 mb-4 bg-white">
-                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-12 h-12 bg-[#F97316]/10 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-hand-peace text-[#F97316] text-xl"></i>
-                                        </div>
-                                        <div>
-                                            <h4 class="font-bold text-[#0F172A] text-lg">{{ $artisan->organization_name }}</h4>
-                                            <p class="text-sm text-gray-500">Demande du {{ $artisan->created_at->format('d/m/Y') }}</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                                        <div>
-                                            <p class="text-xs text-gray-500">Nom complet</p>
-                                            <p class="text-sm font-medium text-[#0F172A]">{{ $artisan->name }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Email</p>
-                                            <p class="text-sm font-medium text-[#0F172A]">{{ $artisan->email }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Téléphone</p>
-                                            <p class="text-sm font-medium text-[#0F172A]">{{ $artisan->phone ?? 'Non renseigné' }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Pays / Ville</p>
-                                            <p class="text-sm font-medium text-[#0F172A]">{{ $artisan->country }} / {{ $artisan->city }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Nombre de membres</p>
-                                            <p class="text-sm font-medium text-[#0F172A]">{{ $artisan->organization_members ?? 'Non renseigné' }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Spécialisation</p>
-                                            <p class="text-sm font-medium text-[#0F172A]">{{ $artisan->specialization ?? 'Non renseignée' }}</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <p class="text-xs text-gray-500">Description de l'organisation</p>
-                                        <p class="text-sm text-[#0F172A] bg-gray-50 p-2 rounded-lg mt-1">{{ $artisan->organization_desc ?? 'Non renseignée' }}</p>
-                                    </div>
-                                    
-                                    <div>
-                                        <p class="text-xs text-gray-500">Motivation</p>
-                                        <p class="text-sm text-[#0F172A] bg-gray-50 p-2 rounded-lg mt-1">{{ $artisan->motivation ?? 'Non renseignée' }}</p>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex flex-row md:flex-col gap-2">
-                                    <form method="POST" action="{{ route('admin.artisans.approve', $artisan->id) }}">
-                                        @csrf
-                                        <button type="submit" class="btn-accept w-full px-4 py-2 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
-                                            <i class="fas fa-check"></i> Accepter
-                                        </button>
-                                    </form>
-                                    <form method="POST" action="{{ route('admin.artisans.reject', $artisan->id) }}">
-                                        @csrf
-                                        <button type="submit" class="btn-reject w-full px-4 py-2 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
-                                            <i class="fas fa-times"></i> Refuser
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-8">
-                            <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
-                            <p class="text-gray-500">Aucune demande en attente</p>
-                            <p class="text-sm text-gray-400 mt-1">Toutes les candidatures ont été traitées</p>
-                        </div>
-                    @endforelse
+                <div class="p-4 md:p-6" id="pendingArtisansList">
+                    <div class="text-center py-8">
+                        <div class="loading-spinner"></div>
+                        <p class="text-gray-500 mt-3">Chargement des demandes...</p>
+                    </div>
                 </div>
             </div>
             
@@ -436,7 +383,7 @@
                         <h3 class="font-bold text-[#0F172A]">Évolution des signalements</h3>
                         <select id="chartPeriod" class="text-sm border border-gray-200 rounded-lg px-3 py-1">
                             <option value="7">7 derniers jours</option>
-                            <option value="30">30 derniers jours</option>
+                            <option value="30" selected>30 derniers jours</option>
                             <option value="90">90 derniers jours</option>
                         </select>
                     </div>
@@ -444,8 +391,8 @@
                 </div>
                 
                 <div class="bg-white rounded-xl p-4 md:p-6 shadow-sm">
-                    <h3 class="font-bold text-[#0F172A] mb-4">Répartition par région</h3>
-                    <canvas id="regionChart" height="250"></canvas>
+                    <h3 class="font-bold text-[#0F172A] mb-4">Répartition par type de conflit</h3>
+                    <canvas id="typeChart" height="250"></canvas>
                 </div>
             </div>
             
@@ -457,7 +404,7 @@
                             <h3 class="font-bold text-[#0F172A] text-lg md:text-xl">Signalements récents</h3>
                             <p class="text-xs md:text-sm text-gray-500 mt-1">Les derniers signalements en attente de traitement</p>
                         </div>
-                        <a href="#" class="text-sm text-[#F97316] hover:text-orange-600 transition">Voir tous →</a>
+                        <a href="{{ route('admin.signals') }}" class="text-sm text-[#F97316] hover:text-orange-600 transition">Voir tous →</a>
                     </div>
                 </div>
                 
@@ -475,40 +422,12 @@
                             </tr>
                         </thead>
                         <tbody id="recentReportsTable">
-                            @forelse($recentReports ?? [] as $report)
-                            <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
-                                <td class="py-3 px-4 md:px-6 text-sm text-gray-600">#{{ $report->id }}</td>
-                                <td class="py-3 px-4 md:px-6">
-                                    <div class="flex items-center gap-2">
-                                        <i class="fas fa-map-marker-alt text-[#F97316] text-xs"></i>
-                                        <span class="text-sm font-medium">{{ $report->city }}, {{ $report->region }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 md:px-6"><span class="text-sm">{{ $report->type }}</span></td>
-                                <td class="py-3 px-4 md:px-6">
-                                    <span class="badge-{{ $report->severity }} px-2 py-1 rounded-full text-xs font-semibold">
-                                        {{ $report->severity }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 md:px-6 text-sm text-gray-500">{{ $report->created_at->format('d/m/Y H:i') }}</td>
-                                <td class="py-3 px-4 md:px-6">
-                                    <span class="px-2 py-1 rounded-full text-xs font-semibold badge-pending">
-                                        En attente
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 md:px-6">
-                                    <button onclick="viewReport({{ $report->id }})" class="text-[#F97316] hover:text-orange-600 transition">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            @empty
                             <tr>
                                 <td colspan="7" class="text-center py-8 text-gray-500">
-                                    <i class="fas fa-inbox mr-2"></i>Aucun signalement récent
+                                    <div class="loading-spinner"></div>
+                                    <span class="ml-2">Chargement des signalements...</span>
                                 </td>
                             </tr>
-                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -521,12 +440,12 @@
                     <p class="text-xs md:text-sm text-gray-500 mt-1">Visualisation des zones à risque par région</p>
                 </div>
                 <div class="p-4 md:p-6">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
-                        @foreach($regionsData ?? ['Maritime' => 0, 'Plateaux' => 0, 'Centrale' => 0, 'Kara' => 0, 'Savanes' => 0] as $region => $count)
-                        <div class="text-center p-3 md:p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4" id="regionsGrid">
+                        @foreach(['Maritime', 'Plateaux', 'Centrale', 'Kara', 'Savanes'] as $region)
+                        <div class="text-center p-3 md:p-4 bg-gray-50 rounded-lg hover:bg-orange-50 transition cursor-pointer region-card" data-region="{{ $region }}">
                             <i class="fas fa-map-marker-alt text-[#F97316] text-lg md:text-xl mb-2"></i>
                             <p class="font-semibold text-xs md:text-sm">{{ $region }}</p>
-                            <p class="text-xl md:text-2xl font-bold text-[#0F172A]">{{ $count }}</p>
+                            <p class="text-xl md:text-2xl font-bold text-[#0F172A] region-count" id="region-{{ $region }}">0</p>
                             <p class="text-xs text-gray-500">signalements</p>
                         </div>
                         @endforeach
@@ -547,7 +466,6 @@
                 sidebar.classList.toggle('-translate-x-full');
             });
             
-            // Fermer le sidebar en cliquant à l'extérieur sur mobile
             document.addEventListener('click', (e) => {
                 if (window.innerWidth < 768) {
                     if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
@@ -559,34 +477,219 @@
         
         // Chart instances
         let trendChart = null;
-        let regionChart = null;
+        let typeChart = null;
         
-        async function loadDashboardData() {
+        // Fonction pour charger toutes les données du dashboard
+        async function loadAllDashboardData() {
+            await loadStats();
+            await loadPendingArtisans();
+            await loadRecentReports();
+            await loadRegionsData();
+        }
+        
+        // Charger les statistiques
+        async function loadStats() {
             try {
-                const period = document.getElementById('chartPeriod')?.value || 30;
-                const response = await fetch(`/admin/api/dashboard-data?period=${period}`);
+                const response = await fetch('/admin/api/stats');
                 const data = await response.json();
                 
-                if (data.stats) {
+                if (data.success) {
                     document.getElementById('totalReports').innerText = data.stats.total || 0;
                     document.getElementById('resolvedReports').innerText = data.stats.resolved || 0;
                     document.getElementById('pendingReports').innerText = data.stats.pending || 0;
-                    document.getElementById('activeMediators').innerText = data.stats.mediators || 0;
+                    document.getElementById('activeArtisans').innerText = data.stats.artisans || 0;
                     
                     const resolutionRate = data.stats.total > 0 ? Math.round((data.stats.resolved / data.stats.total) * 100) : 0;
                     document.getElementById('resolutionRate').innerText = resolutionRate;
-                    document.getElementById('avgResponseTime').innerText = data.stats.avgResponseTime || 24;
+                    document.getElementById('avgResponseTime').innerText = data.stats.avgResponseTime || 0;
+                    document.getElementById('reportGrowth').innerText = data.stats.growth || 0;
+                    document.getElementById('newArtisans').innerText = data.stats.newArtisans || 0;
                 }
-                
-                updateTrendChart(data.trendData);
-                updateRegionChart(data.regionsData);
-                
             } catch (error) {
-                console.error('Erreur:', error);
+                console.error('Erreur chargement stats:', error);
             }
         }
         
-        function updateTrendChart(data) {
+        // Charger les artisans en attente
+        async function loadPendingArtisans() {
+            try {
+                const response = await fetch('/admin/api/pending-artisans');
+                const data = await response.json();
+                const container = document.getElementById('pendingArtisansList');
+                const pendingCountSpan = document.getElementById('pendingCount');
+                
+                if (data.success && data.artisans.length > 0) {
+                    pendingCountSpan.innerText = data.artisans.length + ' en attente';
+                    container.innerHTML = '';
+                    
+                    data.artisans.forEach(artisan => {
+                        const card = document.createElement('div');
+                        card.className = 'artisan-card rounded-xl p-4 md:p-5 mb-4 bg-white border';
+                        card.innerHTML = `
+                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-3">
+                                        <div class="w-12 h-12 bg-[#F97316]/10 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-hand-peace text-[#F97316] text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-bold text-[#0F172A] text-lg">${escapeHtml(artisan.name)}</h4>
+                                            <p class="text-sm text-gray-500">${escapeHtml(artisan.organization_name || 'Indépendant')}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                        <div>
+                                            <p class="text-xs text-gray-500">Email</p>
+                                            <p class="text-sm font-medium text-[#0F172A]">${escapeHtml(artisan.email)}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Téléphone</p>
+                                            <p class="text-sm font-medium text-[#0F172A]">${escapeHtml(artisan.phone || 'Non renseigné')}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Pays / Ville</p>
+                                            <p class="text-sm font-medium text-[#0F172A]">${escapeHtml(artisan.country || 'Togo')} / ${escapeHtml(artisan.city || 'Non renseignée')}</p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-500">Spécialisation</p>
+                                            <p class="text-sm font-medium text-[#0F172A]">${escapeHtml(artisan.specialization || 'Non renseignée')}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    ${artisan.motivation ? `
+                                    <div class="mb-3">
+                                        <p class="text-xs text-gray-500">Motivation</p>
+                                        <p class="text-sm text-[#0F172A] bg-gray-50 p-2 rounded-lg mt-1">${escapeHtml(artisan.motivation)}</p>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                
+                                <div class="flex flex-row md:flex-col gap-2">
+                                    <form method="POST" action="/admin/artisans/${artisan.id}/approve" onsubmit="return confirm('Accepter cet artisan ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn-accept w-full px-4 py-2 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
+                                            <i class="fas fa-check"></i> Accepter
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="/admin/artisans/${artisan.id}/reject" onsubmit="return confirm('Refuser cet artisan ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn-reject w-full px-4 py-2 rounded-lg text-white font-semibold text-sm flex items-center justify-center gap-2">
+                                            <i class="fas fa-times"></i> Refuser
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    pendingCountSpan.innerText = '0 en attente';
+                    container.innerHTML = `
+                        <div class="text-center py-8">
+                            <i class="fas fa-check-circle text-green-500 text-4xl mb-3"></i>
+                            <p class="text-gray-500">Aucune demande en attente</p>
+                            <p class="text-sm text-gray-400 mt-1">Toutes les candidatures ont été traitées</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur chargement artisans:', error);
+            }
+        }
+        
+        // Charger les signalements récents
+        async function loadRecentReports() {
+            try {
+                const response = await fetch('/admin/api/recent-reports');
+                const data = await response.json();
+                const tbody = document.getElementById('recentReportsTable');
+                
+                if (data.success && data.reports.length > 0) {
+                    tbody.innerHTML = '';
+                    
+                    data.reports.forEach(report => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
+                        
+                        let severityClass = 'medium';
+                        let severityText = 'Moyen';
+                        if (report.danger_level >= 80) { severityClass = 'critical'; severityText = 'Critique'; }
+                        else if (report.danger_level >= 60) { severityClass = 'high'; severityText = 'Élevé'; }
+                        else if (report.danger_level >= 30) { severityClass = 'medium'; severityText = 'Moyen'; }
+                        else { severityClass = 'low'; severityText = 'Faible'; }
+                        
+                        row.innerHTML = `
+                            <td class="py-3 px-4 md:px-6 text-sm text-gray-600">#${report.id}</td>
+                            <td class="py-3 px-4 md:px-6">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-map-marker-alt text-[#F97316] text-xs"></i>
+                                    <span class="text-sm font-medium">${escapeHtml(report.zone || report.city || 'Non spécifié')}</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 md:px-6"><span class="text-sm">${escapeHtml(report.type)}</span></td>
+                            <td class="py-3 px-4 md:px-6">
+                                <span class="badge-${severityClass} px-2 py-1 rounded-full text-xs font-semibold">${severityText}</span>
+                            </td>
+                            <td class="py-3 px-4 md:px-6 text-sm text-gray-500">${new Date(report.created_at).toLocaleString('fr-FR')}</td>
+                            <td class="py-3 px-4 md:px-6">
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold badge-pending">En attente</span>
+                            </td>
+                            <td class="py-3 px-4 md:px-6">
+                                <button onclick="viewReport(${report.id})" class="text-[#F97316] hover:text-orange-600 transition">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } else {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center py-8 text-gray-500">
+                                <i class="fas fa-inbox mr-2"></i>Aucun signalement récent
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur chargement signalements:', error);
+            }
+        }
+        
+        // Charger les données des régions
+        async function loadRegionsData() {
+            try {
+                const response = await fetch('/admin/api/regions-stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    for (const [region, count] of Object.entries(data.regions)) {
+                        const element = document.getElementById(`region-${region}`);
+                        if (element) element.innerText = count;
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur chargement régions:', error);
+            }
+        }
+        
+        // Charger les graphiques
+        async function loadCharts(period = 30) {
+            try {
+                const response = await fetch(`/admin/api/charts-data?period=${period}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    initTrendChart(data.trend);
+                    initTypeChart(data.types);
+                }
+            } catch (error) {
+                console.error('Erreur chargement graphiques:', error);
+            }
+        }
+        
+        function initTrendChart(data) {
             const ctx = document.getElementById('trendChart').getContext('2d');
             if (trendChart) trendChart.destroy();
             
@@ -604,36 +707,46 @@
                         pointBackgroundColor: '#F97316',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
-                        pointRadius: 4
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true } }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: '#E2E8F0' } },
+                        x: { grid: { display: false } }
+                    }
                 }
             });
         }
         
-        function updateRegionChart(data) {
-            const ctx = document.getElementById('regionChart').getContext('2d');
-            if (regionChart) regionChart.destroy();
+        function initTypeChart(data) {
+            const ctx = document.getElementById('typeChart').getContext('2d');
+            if (typeChart) typeChart.destroy();
             
-            regionChart = new Chart(ctx, {
+            typeChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: data?.labels || ['Maritime', 'Plateaux', 'Centrale', 'Kara', 'Savanes'],
+                    labels: data?.labels || [],
                     datasets: [{
-                        data: data?.values || [0, 0, 0, 0, 0],
-                        backgroundColor: ['#F97316', '#3B82F6', '#10B981', '#8B5CF6', '#EC4899'],
-                        borderWidth: 0
+                        data: data?.values || [],
+                        backgroundColor: ['#F97316', '#3B82F6', '#8B5CF6', '#10B981', '#EC4899'],
+                        borderWidth: 0,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 11 } } }
+                    }
                 }
             });
         }
@@ -642,11 +755,31 @@
             window.location.href = `/admin/signalements/${id}`;
         }
         
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
+            loadAllDashboardData();
+            loadCharts(30);
+            
             const periodSelect = document.getElementById('chartPeriod');
             if (periodSelect) {
-                periodSelect.addEventListener('change', () => loadDashboardData());
+                periodSelect.addEventListener('change', (e) => {
+                    loadCharts(e.target.value);
+                });
             }
+            
+            // Rafraîchissement automatique toutes les 30 secondes
+            setInterval(() => {
+                loadStats();
+                loadPendingArtisans();
+                loadRecentReports();
+            }, 30000);
         });
     </script>
 </body>

@@ -91,7 +91,7 @@ class AuthenticatedSessionController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        return redirect('/artisan/dashboard');
+        return redirect('/dashboard');
     }
 
     /**
