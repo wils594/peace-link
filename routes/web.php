@@ -101,11 +101,9 @@ Route::get('/hotspots', function () {
 
 })->name('admin.hotspots');
 
-Route::get('/artisans', function () {
-
-    return view('artisans');
-
-})->name('admin.artisans');
+Route::get('/artisans',
+    [DashboardController::class, 'artisans'])
+    ->name('artisans');
 
 Route::get('/statistics', function () {
 
@@ -161,6 +159,10 @@ Route::post('/report',
         'success' => true,
         'reports' => $reports
     ]);
+
+    Route::get('/hotspots',
+    [ReportController::class, 'hotspots'])
+    ->name('hotspots');
 
 });
 

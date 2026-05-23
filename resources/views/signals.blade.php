@@ -189,7 +189,7 @@
                 <i class="fas fa-map-marker-alt w-5"></i>
                 <span>Zones sensibles</span>
             </a>
-            <a href="{{ route('admin.artisans') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
+            <a href="{{ route('artisans') }}" class="sidebar-link flex items-center gap-3 px-6 py-3 text-gray-300 hover:text-white transition">
                 <i class="fas fa-users w-5"></i>
                 <span>Artisans de la paix</span>
             </a>

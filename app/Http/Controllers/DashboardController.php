@@ -99,4 +99,41 @@ class DashboardController extends Controller
             ->back()
             ->with('success', 'Artisan refusé.');
     }
+
+    public function artisans(Request $request)
+{
+    $search = $request->search;
+
+    $artisans = User::query()
+
+        ->where('type', 'artisan')
+
+        ->when($search, function ($query) use ($search) {
+
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+
+        })
+
+        ->latest()
+
+        ->get();
+
+    $totalArtisans = $artisans->count();
+
+    $approvedCount = User::where('status', 'approved')->count();
+
+    $pendingCount = User::where('status', 'pending')->count();
+
+    $rejectedCount = User::where('status', 'rejected')->count();
+
+    return view('artisans', compact(
+        'artisans',
+        'search',
+        'totalArtisans',
+        'approvedCount',
+        'pendingCount',
+        'rejectedCount'
+    ));
+}
 }

@@ -91,4 +91,12 @@ public function adminSignals()
         'resolvedCount'
     ));
 }
+
+public function hotspots()
+{
+    $reports = Report::latest()->get();
+
+    return view('hotspots', compact('reports'));
+}
+
 }
